@@ -12,6 +12,29 @@ La configuración propia se persiste como JSON con backups en
 `trust`). Las operaciones privilegiadas usan `pkexec`. Todas las rutas e identidad
 de la app viven centralizadas en [`ajustes/config.py`](ajustes/config.py).
 
+## ¿Y el compositor? — pensado para Hyprland
+
+TendroSettings está hecho **para Hyprland**, pero **nunca edita tu `hyprland.lua`**.
+Escribe JSON en `~/.config/hypr/settings/` que un *loader* Lua
+(`require("settings")`) lee desde tu config — separación código/datos: tu
+`hyprland.lua` queda intacto.
+
+Estos módulos **configuran el compositor (Hyprland)** y solo aplican en Hyprland:
+
+| Módulo | Qué toca en Hyprland |
+|--------|----------------------|
+| **Apariencia** | `general` (gaps, bordes), `decoration` (rounding, blur), `animations`, colores de borde |
+| **Keybindings** | binds (`hl.bind`) |
+| **Monitores** | salida/resolución/escala/posición + energía (hypridle) |
+| **Wallpaper** | hyprpaper / swww |
+
+Estos módulos son **agnósticos al compositor** (funcionan en cualquier distro/escritorio,
+no solo Hyprland): **GRUB**, **Dualboot**, **Snapshots** y **Credenciales** (más los
+**Colores de apps KDE/GTK** dentro de Apariencia, que son theming de Qt/GTK, no de Hyprland).
+
+> Si usas otro compositor (Sway, Niri…), los módulos de Hyprland no te aplicarán, pero
+> los de sistema sí. El soporte para otros compositores no está implementado.
+
 ## Dependencias (sistema)
 
 `python python-gobject gtk4 libadwaita libsecret`
