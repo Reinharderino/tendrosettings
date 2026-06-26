@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=TendroSettings
+GenericName=Ajustes del sistema
+Comment=Centro de ajustes: apariencia, monitores, GRUB, dualboot, snapshots y credenciales
+Exec=tendrosettings
+Icon=preferences-system
+Terminal=false
+Categories=Settings;System;GTK;
+Keywords=ajustes;settings;hyprland;grub;dualboot;snapshots;credenciales;
+StartupNotify=true

@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+build/
+dist/
+*.egg-info/
+*.whl
+
+# Configuración y artefactos de Claude / flujo de IA — se mantienen LOCALES
+.claude/
+CLAUDE.md
+AGENTS.md
+.mcp.json
+docs/superpowers/
