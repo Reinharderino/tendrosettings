@@ -10,6 +10,7 @@ from ajustes.modules import wallpaper as wallpaper_module  # noqa: E402
 from ajustes.modules import appearance as appearance_module  # noqa: E402
 from ajustes.modules import keybindings as keybindings_module  # noqa: E402
 from ajustes.modules import monitors as monitors_module  # noqa: E402
+from ajustes.modules import workspaces as workspaces_module  # noqa: E402
 from ajustes.modules import snapshots as snapshots_module  # noqa: E402
 from ajustes.modules import grub as grub_module  # noqa: E402
 from ajustes.modules import dualboot as dualboot_module  # noqa: E402
@@ -21,6 +22,7 @@ MODULE_CARDS = [
     (appearance_module.MODULE_ID, "Apariencia", "Gaps, bordes, blur y colores", "preferences-desktop-theme-symbolic", True),
     (keybindings_module.MODULE_ID, "Keybindings", "Atajos de teclado", "input-keyboard-symbolic", True),
     (monitors_module.MODULE_ID, "Monitores", "Resolución y energía", "video-display-symbolic", True),
+    (workspaces_module.MODULE_ID, "Workspaces", "Asignar a monitores", "view-grid-symbolic", True),
     (snapshots_module.MODULE_ID, "Snapshots", "Crear y borrar snapshots", "document-open-recent-symbolic", True),
     (grub_module.MODULE_ID, "GRUB", "Flags del kernel (cmdline)", "application-x-firmware-symbolic", True),
     (dualboot_module.MODULE_ID, "Dualboot", "Arranque entre sistemas", "computer-symbolic", True),
@@ -35,6 +37,7 @@ class AjustesWindow(Adw.ApplicationWindow):
         self.set_default_size(760, 560)
         self._all_entries = [*wallpaper_module.ENTRIES, *appearance_module.ENTRIES,
                              *keybindings_module.ENTRIES, *monitors_module.ENTRIES,
+                             *workspaces_module.ENTRIES,
                              *snapshots_module.ENTRIES, *grub_module.ENTRIES,
                              *dualboot_module.ENTRIES, *credentials_module.ENTRIES]
 
@@ -110,6 +113,10 @@ class AjustesWindow(Adw.ApplicationWindow):
             from ajustes.modules.monitors.view import MonitorsPage
 
             self._navigation.push(MonitorsPage())
+        elif module_id == workspaces_module.MODULE_ID:
+            from ajustes.modules.workspaces.view import WorkspacesPage
+
+            self._navigation.push(WorkspacesPage())
         elif module_id == snapshots_module.MODULE_ID:
             from ajustes.modules.snapshots.view import SnapshotsPage
 
