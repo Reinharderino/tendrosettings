@@ -15,6 +15,7 @@ from ajustes.modules import snapshots as snapshots_module  # noqa: E402
 from ajustes.modules import grub as grub_module  # noqa: E402
 from ajustes.modules import dualboot as dualboot_module  # noqa: E402
 from ajustes.modules import credentials as credentials_module  # noqa: E402
+from ajustes.modules import autostart as autostart_module  # noqa: E402
 
 # (module_id, título, subtítulo, icono, activo)
 MODULE_CARDS = [
@@ -27,7 +28,7 @@ MODULE_CARDS = [
     (grub_module.MODULE_ID, "GRUB", "Flags del kernel (cmdline)", "application-x-firmware-symbolic", True),
     (dualboot_module.MODULE_ID, "Dualboot", "Arranque entre sistemas", "computer-symbolic", True),
     (credentials_module.MODULE_ID, "Credenciales", "Llavero, SSH, GPG y TLS", "dialog-password-symbolic", True),
-    ("autostart", "Autostart", "Próximamente", "system-run-symbolic", False),
+    (autostart_module.MODULE_ID, "Autostart", "Apps y comandos al iniciar", "system-run-symbolic", True),
 ]
 
 
@@ -39,7 +40,8 @@ class AjustesWindow(Adw.ApplicationWindow):
                              *keybindings_module.ENTRIES, *monitors_module.ENTRIES,
                              *workspaces_module.ENTRIES,
                              *snapshots_module.ENTRIES, *grub_module.ENTRIES,
-                             *dualboot_module.ENTRIES, *credentials_module.ENTRIES]
+                             *dualboot_module.ENTRIES, *credentials_module.ENTRIES,
+                             *autostart_module.ENTRIES]
 
         self._navigation = Adw.NavigationView()
         self.set_content(self._navigation)
@@ -133,6 +135,10 @@ class AjustesWindow(Adw.ApplicationWindow):
             from ajustes.modules.credentials.view import CredentialsPage
 
             self._navigation.push(CredentialsPage())
+        elif module_id == autostart_module.MODULE_ID:
+            from ajustes.modules.autostart.view import AutostartPage
+
+            self._navigation.push(AutostartPage())
 
 
 class AjustesApplication(Adw.Application):
