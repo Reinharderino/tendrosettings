@@ -392,4 +392,26 @@ function M.workspaces(hl)
     return registered
 end
 
+--- Ejecuta con hl.exec_cmd los comandos enabled de autostart.json.
+--- Se invoca DENTRO de hl.on("hyprland.start"), después del bloque crítico.
+--- JAMÁS lanza error: JSON ausente/corrupto → no hace nada.
+function M.autostart(hl)
+    local data = M.load("autostart", { entries = {} })
+    local list = type(data.entries) == "table" and data.entries or {}
+    local launched = 0
+    for _, entry in ipairs(list) do
+        if type(entry) == "table" and entry.enabled ~= false
+            and type(entry.command) == "string" and entry.command ~= "" then
+            local ok, err = pcall(hl.exec_cmd, entry.command)
+            if ok then
+                launched = launched + 1
+            else
+                print("hypr-ajustes: autostart '" .. entry.command
+                      .. "' omitido: " .. tostring(err))
+            end
+        end
+    end
+    return launched
+end
+
 return M
