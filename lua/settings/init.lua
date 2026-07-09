@@ -366,4 +366,30 @@ function M.wallpaper(hl)
     return applied
 end
 
+--- Aplica las reglas de workspace→monitor desde workspaces.json con hl.workspace_rule.
+--- Solo emite regla para workspaces con monitor asignado (monitor == "" se omite).
+--- JAMÁS lanza error: JSON ausente/corrupto → no hace nada.
+function M.workspaces(hl)
+    local data = M.load("workspaces", { workspaces = {} })
+    local list = type(data.workspaces) == "table" and data.workspaces or {}
+    local registered = 0
+    for _, spec in ipairs(list) do
+        if type(spec) == "table" and type(spec.number) == "number"
+            and type(spec.monitor) == "string" and spec.monitor ~= "" then
+            local ok, err = pcall(hl.workspace_rule, {
+                workspace  = tostring(math.floor(spec.number)),
+                monitor    = spec.monitor,
+                persistent = spec.persistent == true,
+            })
+            if ok then
+                registered = registered + 1
+            else
+                print("hypr-ajustes: workspace '" .. tostring(spec.number)
+                      .. "' omitido: " .. tostring(err))
+            end
+        end
+    end
+    return registered
+end
+
 return M
