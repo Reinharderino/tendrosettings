@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from ajustes.core.apply_workspaces import ApplyWorkspaces
 from ajustes.core.config_store import ConfigStore
