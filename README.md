@@ -3,7 +3,8 @@
 Centro de ajustes del sistema para Hyprland/CachyOS, en GTK4 + libadwaita.
 
 Módulos: Wallpaper, Apariencia (gaps/bordes/blur/colores, animaciones, colores de
-apps KDE/GTK), Keybindings, Monitores, Snapshots (snapper), GRUB (flags del kernel),
+apps KDE/GTK), Keybindings, Monitores, Workspaces (reglas workspace→monitor),
+Autostart (apps al iniciar sesión), Snapshots (snapper), GRUB (flags del kernel),
 Dualboot (UEFI + GRUB) y Credenciales (llavero/Secret Service, SSH, GPG, TLS/CA).
 
 La configuración propia se persiste como JSON con backups en
@@ -24,8 +25,10 @@ Estos módulos **configuran el compositor (Hyprland)** y solo aplican en Hyprlan
 | Módulo | Qué toca en Hyprland |
 |--------|----------------------|
 | **Apariencia** | `general` (gaps, bordes), `decoration` (rounding, blur), `animations`, colores de borde |
-| **Keybindings** | binds (`hl.bind`) |
+| **Keybindings** | binds propios (`hl.bind`) + catálogo del sistema (`hyprctl binds`) en solo lectura |
 | **Monitores** | salida/resolución/escala/posición + energía (hypridle) |
+| **Workspaces** | reglas `workspace_rule` (workspace→monitor, persistencia) |
+| **Autostart** | apps a ejecutar al iniciar la sesión (`exec-once`) |
 | **Wallpaper** | hyprpaper / swww |
 
 Estos módulos son **agnósticos al compositor** (funcionan en cualquier distro/escritorio,
@@ -66,6 +69,6 @@ tendrosettings
 ## Desarrollo
 
 ```bash
-python -m pytest        # 313 tests
+python -m pytest        # 320 tests (+ specs Lua en tests/lua/, vía busted)
 python -m ajustes       # ejecutar sin instalar
 ```
