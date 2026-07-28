@@ -1,0 +1,4 @@
+# Fuera de los tarballs de release (`git archive` / tarball auto de GitHub):
+# el que instala no necesita la suite de tests, el que clona sí la tiene.
+tests/ export-ignore
+.gitattributes export-ignore
