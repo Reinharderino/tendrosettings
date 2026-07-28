@@ -24,15 +24,16 @@ optdepends=(
     'hyprland: integración con el loader Lua de la sesión'
 )
 makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
-source=()  # build local: ejecutar makepkg desde el repo
+source=("$url/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
+sha256sums=('b585c07530f18b955af2aba2571c35c3d033ea10576b49884cd3d0ed8e947d2a')
 
 build() {
-    cd "$startdir"
+    cd "$srcdir/$pkgname-$pkgver"
     python -m build --wheel --no-isolation
 }
 
 package() {
-    cd "$startdir"
+    cd "$srcdir/$pkgname-$pkgver"
     python -m installer --destdir="$pkgdir" dist/*.whl
 
     # Lanzador .desktop
