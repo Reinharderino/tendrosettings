@@ -25,11 +25,20 @@ def test_apply_kde_scheme_codigo_error_lanza():
         KdeGtkBridge(run=run).apply_kde_scheme("X")
 
 
-def test_apply_kde_scheme_binario_ausente_lanza():
+def test_apply_kde_scheme_binario_ausente_no_lanza():
+    """Máquina sin Plasma: no hay a quién notificar, pero el resto del apply
+    (GTK, theme.css) debe seguir. Antes lanzaba y abortaba todo."""
+    def run(_args):
+        raise FileNotFoundError
+    KdeGtkBridge(run=run).apply_kde_scheme("X")  # no debe lanzar
+
+
+def test_apply_gtk_binario_ausente_sigue_lanzando():
+    """El opcional es SÓLO para plasma: gsettings ausente sigue siendo un error."""
     def run(_args):
         raise FileNotFoundError
     with pytest.raises(ThemingError):
-        KdeGtkBridge(run=run).apply_kde_scheme("X")
+        KdeGtkBridge(run=run).apply_gtk(prefer_dark=True, accent_name=None)
 
 
 def test_apply_gtk_dark_setea_prefer_dark():

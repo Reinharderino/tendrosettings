@@ -77,3 +77,27 @@ def test_light_background_derives_prefer_light(tmp_path):
     apply.execute(dataclasses.replace(
         AppColorsSettings.defaults(), background_color="#f5f5f5", text_color="#202020"))
     assert bridge.apply_gtk.call_args.kwargs["prefer_dark"] is False
+
+
+def test_writes_palette_into_kdeglobals(tmp_path):
+    """Sin Plasma nadie escribe kdeglobals; si no lo hace el use-case, Dolphin se
+    queda con la paleta anterior (texto nuevo sobre fondo viejo = ilegible)."""
+    kde = tmp_path / "kdeglobals"
+    kde.write_text(
+        "[Colors:View]\nBackgroundNormal=12,10,8\n\n"
+        "[General]\nwidgetStyle=Breeze\nBrowserApplication=google-chrome.desktop\n"
+    )
+    apply, *_ = _make_apply(tmp_path, kdeglobals=kde)
+
+    apply.execute(dataclasses.replace(
+        AppColorsSettings.defaults(),
+        text_color="#111111", background_color="#f2f4f5", accent_color="#ff5c1f",
+    ))
+
+    written = kde.read_text()
+    assert "BackgroundNormal=242,244,245" in written  # fondo nuevo aplicado
+    assert "12,10,8" not in written                   # y el viejo ya no está
+    assert f"ColorScheme={SCHEME_NAME}" in written
+    # Lo que no es color se conserva: kdeglobals es de KDE, no nuestro.
+    assert "widgetStyle=Breeze" in written
+    assert "BrowserApplication=google-chrome.desktop" in written

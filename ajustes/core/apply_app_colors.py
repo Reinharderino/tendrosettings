@@ -1,3 +1,5 @@
+import configparser
+import io
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,6 +14,51 @@ from ajustes.core.theming_bridge import ThemingBridge
 
 # Nombre fijo del esquema que gestiona la app (sobreescribe el suyo en cada apply).
 SCHEME_NAME = "HyprAjustes"
+
+
+def merge_scheme_into_kdeglobals(
+    scheme_content: str, kdeglobals_content: str, scheme_name: str
+) -> str:
+    """Inyecta los grupos [Colors:*] del esquema en un kdeglobals existente.
+
+    Las apps Qt/KDE leen la paleta de kdeglobals, NO del .colors. En una máquina
+    con Plasma eso lo hacía `plasma-apply-colorscheme`; sin Plasma ese binario no
+    existe y el .colors quedaba huérfano: Dolphin seguía con la paleta anterior
+    (texto del tema nuevo sobre fondo del viejo = ilegible).
+
+    Sólo se tocan los grupos de color y `[General] ColorScheme`. Todo lo demás
+    (widgetStyle, fuentes, BrowserApplication, atajos) se conserva: kdeglobals es
+    de KDE, no nuestro, y pisarlo entero borraría ajustes del usuario.
+    """
+    # Raw: los valores de kdeglobals traen '%' (atajos, rutas) que la
+    # interpolación de configparser interpretaría como sintaxis y rompería.
+    def parser() -> configparser.RawConfigParser:
+        cfg = configparser.RawConfigParser(strict=False)
+        cfg.optionxform = str  # kdeglobals distingue mayúsculas en las claves
+        return cfg
+
+    scheme = parser()
+    scheme.read_string(scheme_content)
+
+    merged = parser()
+    if kdeglobals_content:
+        merged.read_string(kdeglobals_content)
+
+    for section in scheme.sections():
+        if not section.startswith("Colors:"):
+            continue
+        merged[section] = dict(scheme[section])
+
+    if not merged.has_section("General"):
+        merged.add_section("General")
+    merged["General"]["ColorScheme"] = scheme_name
+    # El hash lo calcula Plasma para detectar esquemas editados a mano. Sin Plasma
+    # nadie lo valida y uno viejo sólo confunde a quien lea el archivo.
+    merged["General"].pop("ColorSchemeHash", None)
+
+    out = io.StringIO()
+    merged.write(out, space_around_delimiters=False)
+    return out.getvalue()
 
 
 @dataclass(frozen=True)
@@ -54,6 +101,19 @@ class ApplyAppColors:
         backup_and_write(
             self._schemes_dir / f"{SCHEME_NAME}.colors",
             content,
+            backups_dir=self._store.backups_dir(),
+        )
+
+        # kdeglobals es lo que leen de verdad las apps Qt: se escribe acá, no en
+        # el bridge, que sólo avisa a las apps ya abiertas si Plasma está.
+        kdeglobals_before = (
+            self._kdeglobals_path.read_text(encoding="utf-8")
+            if self._kdeglobals_path.exists()
+            else ""
+        )
+        backup_and_write(
+            self._kdeglobals_path,
+            merge_scheme_into_kdeglobals(content, kdeglobals_before, SCHEME_NAME),
             backups_dir=self._store.backups_dir(),
         )
 
